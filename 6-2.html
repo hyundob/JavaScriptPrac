@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>시각을 콘솔로</title>
-  <script>
-    function displayTime() {
-      var d = new Date();
-      console.log("현재 시각은 " + d.toLocaleString() + " 입니다.");
-    }
-    window.onload = function() {
-      var button = document.getElementById("button");
-      button.onclick = displayTime;
-    }
-  </script>
+    <meta charset="utf-8">
+    <title>시각을 콘솔로</title>
+    <script>
+        function displayTime() {
+            var d = new Date();
+            console.log("현재 시각은 " + d.toLocaleString() + " 입니다.");
+        }
+        window.onload = function() {
+            var button = document.getElementById("button");
+            button.onclick = displayTime;
+        }
+    </script>
 </head>
 <body>
 <input type="button" value="click" id="button">
