@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>RGB Pixel Value</title>
+    <style>
+        canvas { border: 2px solid gray; }
+    </style>
+    <script>
+        window.onload = function() {
+            let canvas = document.getElementById("canvas");
+            let ctx = canvas.getContext("2d");
+            let img = new Image();
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+                let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                imageData.getRGBA = function (m, n, i) {
+                    return this.data[this.width * 4 * n + 4 * m * i];
+                };
+                let rgb = document.getElementById("rgb");
+                canvas.onclick = function (event) {
+                    let x = event.offsetX;
+                    let y = event.offsetY;
+                    rgb.innerHTML = " R:" + to3digit(imageData.getRGBA(x, y, 0))
+                        + " G:" + to3digit(imageData.getRGBA(x, y, 1))
+                        + " B:" + to3digit(imageData.getRGBA(x, y, 2));
+                };
+            }
+            img.src = "./cat.jpg";
+        };
+
+        function to3digit(n) {
+            return ("000"+n).slice(-3);
+        }
+    </script>
+</head>
+<body>
+    <canvas id="canvas" width="640" height="400"></canvas>
+    <div><output id="rgb"></output></div>
+</body>
+</html>
