@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>망델브로 집합</title>
+    <style>
+        #mycanvas { border: 1px solid gray; }
+        input { margin: 0 10px; width: 60px; text-align: center; }
+        div { font-size: small; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+<canvas id="mycanvas" width="800" height="640"></canvas>
+<div>중심좌표(<span id="xc">-</span>, <span id="yc">-</span>) ← 클릭 시 이동</div>
+<div>
+    <label>확대 배율: <input id="magnification" type="number" value="0.65"></label>
+    <label>최대 반복: <input id="maxit" type="number" value="60"></label>
+    <button id="button">그리기</button>
+</div>
+
+<script>
+    window.onload = () => {
+        const canvas = document.getElementById("mycanvas");
+        const ctx = canvas.getContext("2d");
+        const width = canvas.width, height = canvas.height;
+        let xc = -0.6, yc = 0;
+
+        const magInput = document.getElementById("magnification");
+        const maxitInput = document.getElementById("maxit");
+        const xcDisp = document.getElementById("xc");
+        const ycDisp = document.getElementById("yc");
+
+        const draw = () => {
+            const mag = parseFloat(magInput.value);
+            const maxit = parseInt(maxitInput.value);
+            xcDisp.textContent = xc.toFixed(3);
+            ycDisp.textContent = yc.toFixed(3);
+            mandelbrot(ctx, xc, yc, mag, maxit);
+        };
+
+        canvas.onclick = e => {
+            const mag = parseFloat(magInput.value);
+            xc += (2 * e.offsetX / width - 1) / mag;
+            yc += (2 * e.offsetY - height) / (mag * width);
+            draw();
+        };
+
+        document.getElementById("button").onclick = draw;
+
+        draw();
+    };
+
+    function mandelbrot(c, xc, yc, mag, maxit) {
+        const w = c.canvas.width, h = c.canvas.height;
+        const xmin = xc - 1 / mag, xmax = xc + 1 / mag;
+        const ymin = yc - (xmax - xmin) * h / w / 2;
+        const ymax = yc + (xmax - xmin) * h / w / 2;
+        const dx = (xmax - xmin) / w;
+        const dy = (ymax - ymin) / h;
+
+        const color = ["black"];
+        for (let i = maxit, L = 255; i > 0; i--) {
+            color[i] = `rgb(255, ${Math.floor(L)}, 255)`; L -= 255 / maxit;
+        }
+
+        for (let i = 0; i < w; i++) {
+            const x = xmin + i * dx;
+            for (let j = 0; j < h; j++) {
+                const y = ymin + j * dy;
+                let a = x, b = y, a2 = a * a, b2 = b * b;
+                let count = maxit;
+                while (a2 + b2 <= 4 && count--) {
+                    b = 2 * a * b + y;
+                    a = a2 - b2 + x;
+                    a2 = a * a;
+                    b2 = b * b;
+                }
+                c.fillStyle = color[count];
+                c.fillRect(i, j, 1, 1);
+            }
+        }
+    }
+</script>
+</body>
+</html>
