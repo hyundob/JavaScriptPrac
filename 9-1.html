@@ -12,12 +12,82 @@
 
             let canvas = document.getElementById('mycanvas');
             let ctx = canvas.getContext('2d');
-            let wall = { left: 0, right: canvas.width, top: 0, botttom: canvas.height };
+            let wall = { left: 0, right: canvas.width, top: 0, bottom: canvas.height };
             let balls = [];
             for(let i=0; i<NBALL; i++) {
                 balls[i] = new Ball(wall.right/2,wall.bottom/2,R);
+                balls[i].setVelocityAsRandom(2,7).setColorAsRandom(50, 255);
+            }
+
+            setInterval(drawFrame, TIME_INTERVAL);
+            function drawFrame() {
+                ctx.fillStyle ='rgba(0,0,0,'+BACK_ALPHA+')';
+                ctx.fillRect(0,0,canvas.width,canvas.height);
+                for(i=0; i<balls.length; i++) {
+                    balls[i].move().collisionWall(wall).draw(ctx);
+                }
+            }
+        }
+        function Ball(x,y,r,vx,vy,color) {
+            this.x = x;
+            this.y = y;
+            this.r = r;
+            this.vx = vx;
+            this.vy = vy;
+            this.color = color;
+        }
+        Ball.prototype = {
+            setVelocityAsRandom: function(vmin, vmax) {
+                let v = vmin + Math.random()*(vmax-vmin);
+                let t = 2*Math.PI*Math.random();
+                this.vx = v*Math.cos(t);
+                this.vy = v*Math.sin(t);
+                return this;
+            },
+            setColorAsRandom: function(lmin, lmax) {
+                let R = Math.floor(lmin+Math.random()*(lmax-lmin));
+                let G = Math.floor(lmin+Math.random()*(lmax-lmin));
+                let B = Math.floor(lmin+Math.random()*(lmax-lmin));
+                this.color = 'rgb('+R+','+G+','+B+')';
+                return this;
+            },
+
+            draw: function(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI, true);
+                ctx.fill();
+                return this;
+            },
+
+            move: function() {
+                this.x += this.vx;
+                this.y += this.vy;
+                return this;
+            },
+            collisionWall: function(wall) {
+                if(this.x - this.r < wall.left) {
+                    this.x = wall.left + this.r;
+                    if(this.vx < 0) this.vx *= -1;
+                }
+                if(this.x + this.r > wall.right) {
+                    this.x = wall.right - this.r;
+                    if(this.vx > 0) this.vx *= -1;
+                }
+                if(this.y-this.r < wall.top) {
+                    this.y = wall.top + this.r;
+                    if(this.vy < 0) this.vy *= -1;
+                }
+                if(this.y+this.r > wall.bottom) {
+                    this.y = wall.bottom - this.r;
+                    if(this.vy > 0) this.vy *= -1;
+                }
+                return this;
             }
         }
     </script>
 </head>
+<body>
+    <canvas id="mycanvas" width=640 height=480></canvas>
+</body>
 </html>
