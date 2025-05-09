@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>두더지 잡기 게임</title>
+    <script>
+        function makeMoles(nx, ny) {
+            let molesState = new Map();
+            let W = 50, SPACE = 10;
+            for(let i=0; i<nx; i++) {
+                for(let j=0; j<ny; j++) {
+                    let element = document.createElement("div");
+                    element.style.width = W + "px";
+                    element.style.height = W + "px";
+                    element.style.background = "url(./mole.jpg)";
+                    element.style.position = "absolute";
+                    element.style.opacity = 0.2;
+                    element.style.transition = "transform 0.5s ease-in-out, opacity 0.5s ease";
+                    document.body.appendChild(element);
+
+                    element.style.left = SPACE + i*(W+SPACE) + "px";
+                    element.style.top = 2*SPACE + j*(W+SPACE) + "px";
+
+                    molesState.set(element,{x:i, y:j, opacity:0.2});
+
+                    element.onclick = function clickEventHandler(e) {
+                        let element = e.currentTarget;
+                        let state = molesState.get(element);
+                        if(state.opacity >= 0.5) {
+                            document.body.removeChild(element);
+                            molesState.delete(element);
+                        }
+                    };
+
+                }
+            }
+            return molesState;
+        }
+        window.onload = function() {
+            let TIME_INTERVAL = 1500, DISPLAY_TIME = 1050;
+            let molesState = makeMoles(7, 4);
+            let timer = setInterval(function appearMole() {
+                if(molesState.size === 0) {
+                    clearInterval(timer);
+                    document.body.innerHTML = "game over";
+                    return;
+                }
+
+                let n = Math.floor(Math.random()*molesState.size);
+                let elements = molesState.keys();
+                let count = 0;
+                for(var element of elements) {
+                    if(count++ === n) break;
+                }
+
+                let state = molesState.get(element);
+                element.style.opacity = 1;
+                state.opacity = 1;
+                element.style.transform = "translateY(-10px)";
+                setTimeout(function hideMole() {
+                    element.style.opacity = 0.2;
+                    state.opacity = 0.2;
+                    element.style.transform = "translateY(0)";
+                }, DISPLAY_TIME);
+            }, TIME_INTERVAL);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>
